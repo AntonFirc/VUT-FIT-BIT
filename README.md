@@ -46,7 +46,7 @@
 - IIS Projekt - 20/30
 - IMP Projekt (ESP8266: snímání teploty (IoT, WiFi AP pro mobilní telefon)) - 13/14
 - ISA Projekt (Nástroje monitorující a generující zprávy jednoduchých distance-vector protokolů) - 13.75/20
-- ITU Projekt (Hra "Červi") - 42/50
+- ITU Projekt (Hra "Červi") - 42/55
 
 ## 6.semester
 - ITW Projekt 1 - 16/20
