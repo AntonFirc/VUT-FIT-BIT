@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-2"/>
+    <title>Projekt IIS</title>
+    <style type="text/css">
+        table { border-collapse: collapse; }
+        td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
+        dt { font-weight: bold; margin-top: 0.5em; }
+    </style>
+</head>
+<body>
+
+<!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
+     podle použitého editoru -->
+
+<h1>Řetězec multikin</h1> <!-- Nahradte názvem svého zadání -->
+
+<dl>
+    <dt>Autoři</dt>
+    <dd>Ondřej Deingruber <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+        <a href="mailto:xdeing00@stud.fit.vutbr.cz">xdeing00@stud.fit.vutbr.cz</a> -
+        správa uživatelů, tržby, rušení rezervací
+    </dd>
+    <dd>Anton Firc <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+        <a href="mailto:xfirca00@stud.fit.vutbr.cz">xfirca00@stud.fit.vutbr.cz</a> -
+        databázový subsystém, zobrazení projekcí, rezervace, prodej
+    </dd>
+    <dt>URL aplikace</dt>
+    <dd><a href="http://www.stud.fit.vutbr.cz/~xfirca00/IIS" target="_blank">http://www.stud.fit.vutbr.cz/~xfirca00/IIS</a></dd>
+</dl>
+
+<h2>Uživatelé systému pro testování</h2>
+<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+<table>
+    <tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+    <tr><td>admin</td><td>admin123</td><td>Administrátor (admin)</td></tr>
+    <tr><td>prodavac</td><td>prodavac123</td><td>Prodavač (cashier)</td></tr>
+    <tr><td>uzivatel</td><td>uzivatel123</td><td>Zákazník (user)</td></tr>
+</table>
+
+<h2>Implementace</h2>
+<h3 style="margin-left: 20px;">Prohlížení a vyhledávaní projekcí</h3>
+<p style="margin-left: 40px;"><b>Skript:</b> <a href="index.php72" target="_blank">index.php72</a></p>
+<p style="margin-left: 40px;">Najprv získa všetky názvy, žánry, premietacie časy a ceny vstupeniek filmov ktoré majú priradené premietanie. Tieto dáta sú použité pre vytvorenie možností filtrovania projekcií = filtrov.
+Následne sú z databázy získané všetky premietania filmov, a vypísané do tabuľky v ktorej je možné výsledky filtrovať podľa názvu, žánru, času premietania a ceny vstupeniek.
+Filtrovanie obsluhuje javascript spustený zmenou hodnoty niektorého filtra. Názov filmu odkazuje na vyskakovacie okno ktoré obsahuje popis filmu. Ku každej projekcii
+je priradený odkaz na stránku rezervácie, ktorý do URL vloží premennú s ID projekcie. Pokiaľ si zoznam filmov prehliada zamestnanec kina, vidí navyše odkaz na predaj lístku na premietanie.
+Oskaz na predaj lístkov odkazuje na inú podstránku, inak funguje totožne s odkazom na rezerváciu.
+    Zobrazuje všetky filmy ktoré majú priradenú projekciu. Poskytuje možnosť filtrovať projekcie podľa názvu filmu, času premietania, žánru a ceny lístka.</p>
+
+<h3 style="margin-left: 20px;">Rezervování konkrétnych miest</h3>
+<p style="margin-left: 40px;"><b>Skript:</b> <a href="reservation.php72" target="_blank">reservation.php72</a></p>
+<p style="margin-left: 40px;">Z databázy získa všetky rezervované sedadlá pre premietanie (ID dané argumentom v URL) a zobrazí "seat picker". Seat picker je tvorený
+maticou check-boxov (pre zjednodušenie má každá sála 5 radov po 10 sedadiel), každý má priradené ID podľa označenia radu a čísla sedadla. Všetky už rezervované sedadlá sú v stave "disabled", čo umožnuje označenie
+a rezerváciu iba ešte nerezervovaných sedadiel. Po kliknutí na tlačítko "Rezervovat", vložený javascript získa ID všetkých označených sedadiel,
+skontroluje či sa počet označených sedadiel rovná zvolenému počtu lístkov a neprekračuje maximálny počet lístkov pre predaj cez internet 6(vymyslená hodnota, má zabrániť narušeniu behu systému falošnými rezerváciami). Následne je metódou POST zavolaný php skript callme.php72 ktorý každé jedno rezervované sedadlo vloží do databázy. Po úspešnej rezervácii všetkých sedadiel je vypísaná hláška informujúca užívateľa o úspechu.</p>
+
+<h3 style="margin-left: 20px;">Zrušiť staršiu rezerváciu</h3>
+<p style="margin-left: 40px;"><b>Skript:</b> <a href="user_reservations.php72" target="_blank">user_reservations.php72</a></p>
+<p style="margin-left: 40px;">Získa z databázy všetky rezervácie s ID užívateľa ktorý je práve prihlásený a vypíše ich. Užívateľ označí z vypísaných rezervácií všetky ktoré chce zrušiť, javascript následne získa ID každej rezervácie a metódou POST zavolá php skript cancel_reservation.php72. Po úspešnom vymazaní rezervácii z databázy je vypísaná hláška informujúca užívateľa o úspechu.</p>
+<p style="margin-left: 40px;"><b>Skript:</b> <a href="manage_reservations.php72" target="_blank">manage_reservations.php72</a></p>
+<p style="margin-left: 40px;">Prístupné len pracovníkom kina. Získa z databázy všetkých užívateľov, a každého meno a login vloži do "select-u" v ktorom je možné vyhľadávať písaním časti mena alebo loginu.
+Vyhľadávanie je implementované v javascripte. Po zvolení užívateľa a kliknutí na tlačidlo "Vypsat rezervace" získa z databázy všetky rezervácie ktoré spravil daný užívateľ, a vypíše ich. Rušenie rezervácií je následne možné rovanko ako v skripte user_reservations.php72.</p>
+
+<h3 style="margin-left: 20px;">Predaj vstupenky</h3>
+<p style="margin-left: 40px;"><b>Skript:</b> <a href="sale.php72" target="_blank">sale.php72</a></p>
+<p style="margin-left: 40px;">Získa argument z URL, určujúci ID premietania na ktoré budú predané lístky. Získa z databázy zoznam všetkých rezervovaných a nezaplatených sedadiel. Následne zobrazí "seat picker", po označení zaplatených miest a kliknutí na tlačítko "Prodat zvolená místa" sú pomocou javascriptu získané ID všetkých označených sedadiel a pre každé sú metódou POST odoslané detaily skriptu set_paid.php72. Tento skript získa dáta a následne aktualizuje rezerváciu.</p>
+
+<h3 style="margin-left: 20px;">Zistenie tržby kina/filmu</h3>
+<p style="margin-left: 40px;"><b>Skript:</b> <a href="sales.php72" target="_blank">sales.php72</a></p>
+<p style="margin-left: 40px;">Z databázy získa počet všetkých predaných vstupeniek na jednotlivé filmy. Podľa počtu jednotlivých vstupeniek a cien vypočíta doposiaľ celkovú tržbu každého filmu. Výsledky zapíše do tabuľky. Následne z databázy získa všetky kiná a uloží ich údaje do poľa ktoré následne prechádza a pre každú lokalitu získa všetky poredané vstupenky. Podľa počtov predaných vstupeniek a cien vypočíta tržby kina. Dáta z každého kina vypíše do tabuľky. Nakoniec sú všetky tržby zrátané a vypísaná celková tržba všetkých kín.</p>
+
+
+<h2>Instalace</h2>
+<ul>
+    <li>Požadovaná verzia PHP
+        <ul>
+            <li>7.2</li>
+        </ul>
+    </li>
+    <li>Inicializácia databázy
+        <ul>
+            <li>Import database.sql na Váš databázový server</li>
+            <li>Nastavenie prístupových údajov do databázy v "config.php72"</li>
+        </ul>
+    </li>
+    <li>Rozbalenie súborov
+        <ul>
+            <li>Všetky php súbory je potrebné rozbaliť do hlavného priečinka.</li>
+            <li>Prvé prihlásenie pomocou mena "admin" a hesla "admin123".</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>Známé problémy</h2>
+<p>Problémy so správnym kódovaním znakov s diakritikou pri vkladaní do databázy.</p>
+
+</body>
+</html>

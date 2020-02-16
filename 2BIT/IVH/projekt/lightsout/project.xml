@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project outputprefix="test">
+
+	<!--  Project description -->
+	<name>Lights Out</name>
+	<author>Anton Firc</author>
+	<authoremail>xfirca00@stud.fit.vutbr.cz</authoremail>
+	<revision>1.0</revision>
+	<description>Hra Lights Out</description>
+
+	<!--  MCU part -->
+	<mcu>
+	    <file>main.c</file>
+	</mcu>
+
+	<!-- FPGA part -->
+	<fpga architecture="pc">
+        <include>fpga/ctrls/vga/package.xml</include>
+	<include>fpga/ctrls/keyboard/package.xml</include>      		
+
+
+	    <file>cell.vhd</file>
+	    <file>lightsout_pack.vhd</file>
+	    <file>top.vhd</file>
+	    <file>bcd.vhd</file>
+	    <file>num_enc.vhd</file>
+	</fpga>
+
+</project>

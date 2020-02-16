@@ -1,0 +1,53 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage{times}
+\usepackage[a4paper,left=2cm,top=3cm,text={17cm, 24cm}]{geometry}
+\usepackage[IL2]{fontenc}
+
+\begin{document}
+	
+	\begin{titlepage}
+		\begin{center}
+			\Huge{\textsc{Vysoké učení technické v~Brně\\}}
+			\huge{\textsc{Fakulta informačních technologií}}
+			\vspace{\stretch{0.382}}
+			
+			\Large {Typografie a publikování\,--\,4. projekt\\}
+			\huge{UNIX}
+			\vspace{\stretch{0.618}}
+		\end{center}
+		{\Large \today \hfill Anton Firc}
+	\end{titlepage}	
+	
+	\section*{História}
+	
+	Vznik operačnéh systému Unix je datovaný rokom 1969. Ken Thompson, Denis Ritchie a Brian Kernighan, pracujúci na projekte nového univerzálneho operačného systému MULTICS, sa snažili vztvoriť príjemnejšie programovacie prostredie ako ponúkal MULTICS. V~roku 1972 bol prepísaný do jazyka C. Tento prechod priniesol väčšiu prenositeľnosť systému. V~70. a 80. rokoch videol vplyv Unix-u v~akademických kruhoch ku vzniku viacerých adaptácií napr. BSD, Solaris\ldots V~90. rokoch s~príchodom a rozšírením vývoja distribúcií Linux a BSD stúpali Unix-like systémy na popularite.
+	
+	\section*{Vplyv Unix-u}
+	UNIX je určite najvplyvnejším systémom v~oblasti vývoja operačných systémov. Prvý vývojári priniesli základné koncepty modularity a znovupoužiteľnosti do oblasti softvérového inžinierstva. Postupom času, veedúci Unix vývojári založili súbor normiem pre vývoj softvéru. Tieto normy sa stali tak dôležitými a vplyvnými ako samotná technológia Unix-u.
+	
+	 Unix ovplyvnil vyše stovky jeho nasledovníkov. Na jednej strane sú to rôzne verzie Unix-u, ktoré začali byť v~80. rokoch komerčné. Na druhej strane stoja Unix-like systémy, ktoré zahŕňajú napríklad OS X od Apple. Nazývajú sa \uv{Unix-like} pretože vývojári BSD, na ktorom tieto systémy zakladajú, odstránili skoro všetok originálny AT\&T kód aby mohli svoj softvér a jeho nástupcov voľne šíriť.
+	
+	\section*{Unix dnes}
+	Svet počítačového hardvéru a softvéru sa vyvíja veľkou rýchlosťou. No navzdory tomu ,že je Unix najstarší operačný systém, je aj v~dnešnej dobe veľmi rozšírený. Unix a Unix-like systémy boli vždy populárne ako servery, s~malou komunitou užívateľov, no s~príchodom \uv{smartfónov} má teraz skoro každý človek vo vrecku \uv{škatuľku Unixového typu.} To, že tento viac ako 45 starý projekt nepatrí do múzea môžu potvrdiť aj bakalárske alebo diplomové práce venujúce sa tejto téme, viď \cite{prac2} \cite{prac1}.
+	
+	\section*{The Unix Programming Enviroment}
+	
+	V~prípade že máte záujem programovať programy pre beh na Unix-e, skvele poslúži kniha \cite{unixprog}. Obsahuje rady pre bezproblémový beh programov na UNIX-e ako aj návody pre použitie rôznych nástrojov.
+	
+	\nocite{Unix}
+	\nocite{wiki}
+	\nocite{linuxvoice}
+	\nocite{art1}
+	\nocite{art2}
+	\nocite{web2}
+	\nocite{web3}
+	
+	\newpage
+	
+	\bibliographystyle{czechiso}
+	\bibliography{citace}
+	
+\end{document}

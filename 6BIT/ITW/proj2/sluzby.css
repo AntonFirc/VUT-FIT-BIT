@@ -1,0 +1,25 @@
+.sluzby-boxes {
+  display: flex;
+}
+
+.sluzby-boxes a img {
+  width: 100%;
+}
+
+.sluzby-boxes a:hover img{
+   transform: scale(1.05);
+}
+
+.sluzby-boxes a:hover span{
+   top: -30px;
+}
+
+.sluzby-boxes span {
+  color: white;
+  position: relative;
+  top: -43px;
+  float: right;
+  padding-right: 20px;
+  font-size: 25px;
+  cursor: pointer;
+}

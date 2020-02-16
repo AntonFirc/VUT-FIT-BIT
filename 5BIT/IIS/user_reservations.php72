@@ -1,0 +1,84 @@
+<?php
+
+session_start();
+
+// Include config file
+require_once "config.php72";
+$res_id = NULL;
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: login.php72");
+    exit;
+}
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vaše rezervace</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; }
+        .wrapper{ width: 350px; padding: 20px; }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("button").click(function(){
+                var favorite = [];
+                $.each($("input[name='movie']:checked"), function(){
+                    favorite.push($(this).attr('id'));
+                });
+                //alert("My favourite sports are: " + favorite.join(", "));
+                $.each(favorite, function(i, val){
+
+                    var res_id = favorite[i];
+                    $.ajax({
+                        type: 'post', // the method (could be GET btw)
+                        url: 'cancel_reservation.php72', // The file where my php code is
+                        data: {
+                            'reservation': res_id, // all variables i want to pass. In this case, only one.
+                        },
+                        success: function(data) { // in case of success get the output, i named data
+                            if (i == favorite.length -1) {
+                                alert("Zvolené rezervace byli zrušeny!");
+                                location.reload();
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<h1>Vaše rezervace:</h1>
+    <div class="wrapper">
+        <ul class="list-group">
+        <?php
+
+        $sql = "SELECT R.ID, R.ID_PROMITANI, F.NAZEV, P.CAS  FROM REZERVACE R, FILM F, PROMITACI_SAL_PROGRAM P WHERE R.ID_PROMITANI = P.ID AND P.FILM_ID = F.ID AND R.UZIVATEL_ID = ?";
+        if ($stmt = $mysqli->prepare($sql)) {
+            $stmt->bind_param("i", $_SESSION["id"]);
+            if ($stmt->execute()) {
+                $stmt->store_result();
+                $stmt->bind_result($res_id,$screen_id, $film, $cas);
+                for($i = 0; $i < $stmt->num_rows; $i++) {
+                    $stmt->fetch();
+                    //echo '<p>'.$film.' '.$cas.'</p>';
+                    echo '<li class="list-group-item"><input class="custom-control-input" type="checkbox" name="movie" id="'.$res_id.'">'.$film.' '.$cas.'</li>';
+                }
+            }
+
+        }
+
+        ?>
+        </ul>
+        <button type="submit" class="btn btn-danger" style="margin-top: 20px;">Zrusit rezervaci</button>
+    </div>
+</body>
+</html>

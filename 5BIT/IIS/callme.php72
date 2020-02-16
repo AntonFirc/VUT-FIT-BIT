@@ -1,0 +1,30 @@
+<?php
+
+// Include config file
+require_once "config.php72";
+
+
+if(isset($_POST['row']) && isset($_POST['col']) && isset($_POST['id']) && isset($_POST['half'])) { //if i have this post
+
+    $sql = "INSERT INTO REZERVACE (ID_PROMITANI, RAD, SEDADLO, UZIVATEL_ID, ZLAVNENY) VALUES (?, ?, ?, ?, ?)";
+    if ($stmt = $mysqli->prepare($sql)) {
+        $stmt->bind_param("iiiii", $param_screen, $param_row, $param_col, $param_user, $param_half);
+
+        $param_screen = $_POST['screen_id'];
+        $param_row = $_POST['row'];
+        $param_col = $_POST['col'];
+        $param_user = $_POST['id'];
+        $param_half = $_POST['half'];
+
+        if ($stmt->execute()) {
+            echo 'Done';
+        } else {
+            echo "Something went wrong. Please try again later.";
+        }
+    } else {
+        echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
+    $stmt->close();
+    $mysqli->close();
+}
+?>

@@ -1,0 +1,161 @@
+<?php
+ob_start();
+// Initialize the session
+session_start();
+
+// Include config file
+require_once "config.php72";
+
+$sala = $film = $time = "";
+$sala_err = $film_err = $time_err = "";
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php72");
+    exit;
+}
+if ((strcmp($_SESSION["position"], "manager")) && (strcmp($_SESSION["position"], "cashier")) && (strcmp($_SESSION["position"], "admin"))) {
+    header("location: login.php72");
+    exit;
+}
+else {
+    if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+        if(empty(trim($_POST["sala"]))){
+            $sala_err = "Please enter sala ID.";
+        } else{
+            $sala = trim($_POST["sala"]);
+        }
+
+        if(empty(trim($_POST["film"]))){
+            $film_err = "Please enter movie ID.";
+        } else{
+            $film = trim($_POST["film"]);
+        }
+
+        if(empty(trim($_POST["time"]))){
+            $time_err = "Please enter screening time.";
+        } else{
+            $time = trim($_POST["time"]);
+        }
+
+        if(empty($sala_err) && empty($film_err) && empty($time_err)) {
+            // Prepare an insert statement
+            $sql = "INSERT INTO PROMITACI_SAL_PROGRAM (CAS, FILM_ID, SALA_ID) VALUES (?, ?, ?)";
+
+            if($stmt = $mysqli->prepare($sql)){
+                // Bind variables to the prepared statement as parameters
+                $stmt->bind_param("sss", $param_time, $param_film, $param_sala);
+
+                // Set parameters
+                $param_time = $time;
+                $param_film = $film;
+                $param_sala = $sala;
+
+                // Attempt to execute the prepared statement
+                if($stmt->execute()){
+                    header("Refresh:0");
+                } else{
+                    echo "Something went wrong. Please try again later.";
+                }
+            }
+
+            // Close statement
+            $stmt->close();
+        }
+        $mysqli->close();
+        ob_end_flush();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Přidat promítaní</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center;}
+        .wrapper{ width: 350px; padding: 20px; margin: 0px auto; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <h2>Přidat promítaní</h2>
+    <p>Zadejte promítání</p>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <div class="form-group">
+            <label>Promítací sál</label>
+            <select class="form-control" name="sala">
+                <?php
+                $sql = "SELECT K.LOKACE, S.ID, S.CISLO_SALU FROM KINO K, PROMITACI_SAL S WHERE K.ID = S.KINO_ID";
+                if ($stmt = $mysqli->prepare($sql)) {
+                    if($stmt->execute()) {
+                        // Store result
+                        $stmt->store_result();
+                        $stmt->bind_result($location,$id, $number);
+                        for ($i = 0; $i < $stmt->num_rows; $i++) {
+                            if($stmt->fetch()){
+                                echo '<option value="'.$id.'">'.$location.' - Sála '.$number.'</option>';
+                            }
+                            else {
+                                echo "Error fetching results: (" . $mysqli->errno . ") " . $mysqli->error;
+                            }
+                        }
+                    }
+                    else {
+                        echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                    }
+                    $stmt->close();
+                }
+                else {
+                    echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                }
+                ?>
+            </select>
+        </div>
+        <div class="form-group <?php echo (!empty($time_err)) ? 'has-error' : ''; ?>">
+            <label>Čas</label>
+            <input type="datetime-local" name="time" class="form-control" value="<?php echo $time; ?>">
+            <span class="help-block"><?php echo $time_err; ?></span>
+        </div>
+        <div class="form-group">
+            <label>Film</label>
+            <select class="form-control" name="film">
+                <?php
+                    $sql = "SELECT NAZEV, ID FROM FILM";
+                    if ($stmt = $mysqli->prepare($sql)) {
+                        if($stmt->execute()) {
+                            // Store result
+                            $stmt->store_result();
+                            $stmt->bind_result($name,$id);
+                            for ($i = 0; $i < $stmt->num_rows; $i++) {
+                                if($stmt->fetch()){
+                                    echo '<option value="'.$id.'">'.$name.'</option>';
+                                }
+                                else {
+                                    echo "Error fetching results: (" . $mysqli->errno . ") " . $mysqli->error;
+                                }
+                            }
+                        }
+                        else {
+                            echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                        $stmt->close();
+                        $mysqli->close();
+                    }
+                    else {
+                        echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                    }
+                ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Uložit">
+            <input type="reset" class="btn btn-default" value="Smazat formulář">
+        </div>
+    </form>
+</div>
+</body>
+</html>

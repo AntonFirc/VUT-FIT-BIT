@@ -1,0 +1,143 @@
+<?php
+// Initialize the session
+session_start();
+
+// Include config file
+require_once "config.php72";
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php72");
+    exit;
+}
+if (strcmp($_SESSION["position"], "manager") && (strcmp($_SESSION["position"], "admin"))) {
+    header("location: login.php72");
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prodeje</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center }
+        .wrapper { text-align: left }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>Tržby</h1>
+    </div>
+    <h2>Filmy</h2>
+    <div class="wrapper">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Název filmu</th>
+                    <th>Cena základní vstupenky</th>
+                    <th>Cena zlevněné vstupenky</th>
+                    <th>Počet základních vstupenek</th>
+                    <th>Počet zlevněných vstupenek</th>
+                    <th>Tržba filmu</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                    $total_sales = 0;
+                    $sql = "SELECT F.NAZEV, F.CENA_DOSPELY, F.CENA_ZLAVNENY, SUM(R.ZLAVNENY), COUNT(R.ID) FROM REZERVACE R, FILM F, PROMITACI_SAL_PROGRAM P WHERE R.ID_PROMITANI = P.ID AND P.FILM_ID = F.ID AND R.ZAPLACENO = 1 GROUP BY F.ID";
+                    if ($stmt = $mysqli->prepare($sql)) {
+                        if ($stmt->execute()) {
+                            $stmt->store_result();
+                            $stmt->bind_result($film, $price_adult, $price_child, $count_zlavneny, $count);
+                            for($i = 0; $i < $stmt->num_rows; $i++) {
+                                $stmt->fetch();
+                                echo '<tr><td>'.$film.'</td><td>'.$price_adult.'</td><td>'.$price_child.'</td><td>'.($count-$count_zlavneny).'</td><td>'.$count_zlavneny.'</td><td>'.(($count-$count_zlavneny)*$price_adult + ($count_zlavneny*$price_child)).' Kč'.'</td></tr>';
+                                $total_sales = $total_sales + ($count-$count_zlavneny)*$price_adult + $count_zlavneny*$price_zlavneny;
+                            }
+                        }
+                        else {
+                            echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                    }
+                    else {
+                        echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                    }
+                    $stmt->close();
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <h2>Kina</h2>
+    <div class="wrapper">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Název kina</th>
+                    <th>Počet prodaných vstupenek</th>
+                    <th>Tržba kina</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                    $cinemas;
+                    // Prepare SQL statement
+                    $sql = "SELECT LOKACE, ID FROM KINO";
+                    if ($stmt = $mysqli->prepare($sql)) {
+                        if ($stmt->execute()) {
+                            $stmt->store_result();
+                            $stmt->bind_result($lokace, $idkino);
+                            // Save cinemas to array
+                            for($i = 0; $i < $stmt->num_rows; $i++) {
+                                $stmt->fetch();
+                                $cinemas[$i] = array($idkino, $lokace);
+                            }
+                        }
+                        else {
+                            echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                    }
+                    else {
+                        echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                    }
+                    $stmt->close();
+                    // For each cinema
+                    for ($i = 0; $i<count($cinemas); $i++) {
+                        $cinema_sales = 0;
+                        $cinema_tickets = 0;
+                        // Prepare SQL statement
+                        $sql = "SELECT F.NAZEV, F.CENA_DOSPELY, F.CENA_ZLAVNENY, SUM(R.ZLAVNENY), COUNT(R.ID) FROM REZERVACE R, FILM F, PROMITACI_SAL_PROGRAM P WHERE R.ID_PROMITANI = P.ID AND P.SALA_ID = ? AND R.ZAPLACENO = 1 AND F.ID = P.FILM_ID GROUP BY F.ID";
+                        if ($stmt = $mysqli->prepare($sql)) {
+                            $stmt->bind_param("s", $cinema);
+                            $cinema = $cinemas[$i][0];
+                            if ($stmt->execute()) {
+                                $stmt->store_result();
+                                $stmt->bind_result($film, $price_adult, $price_zlavneny, $count_zlavneny, $count);
+                                // Conut sales
+                                for($i = 0; $i < $stmt->num_rows; $i++) {
+                                    $stmt->fetch();
+                                    $cinema_sales = $cinema_sales + ($count-$count_zlavneny)*$price_adult + $count_zlavneny*$price_zlavneny;
+                                    $cinema_tickets = $cinema_tickets + $count;
+                                }
+                            }
+                            else {
+                                echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                            }
+                        }
+                        else {
+                            echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                        $stmt->close();
+                        $mysqli->close();
+                        echo '<tr><td>'.$cinemas[$i][1].'</td><td>'.$cinema_tickets.'</td><td>'.$cinema_sales.' Kč</td><td></tr>';
+                    };
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <h2>Celkové tržby</h2>
+    <?php
+        echo '<p> Celkové tržby jsou: '.$cinema_sales.' Kč</p>';
+    ?>
+</body>
+</html>

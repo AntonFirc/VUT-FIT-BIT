@@ -1,0 +1,79 @@
+<?php
+ob_start();
+// Initialize the session
+session_start();
+
+// Include config file
+require_once "config.php72";
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php72");
+    exit;
+}
+else {
+    $sql = "SELECT ID, JMENO, PRIJMENI FROM UZIVATEL WHERE LOGIN = ?";
+
+    if($stmt = $mysqli->prepare($sql)){
+        $stmt->bind_param("s", $_SESSION["username"]);
+        if($stmt->execute()){
+            $stmt->store_result();
+            if($stmt->num_rows == 1){
+                // Bind result variables
+                $stmt->bind_result($get_id, $get_name, $get_surname);
+
+                if($stmt->fetch()){
+                    $name = $get_name;
+                    $surname = $get_surname;
+                }
+                else {
+                    echo "Error fetch";
+                }
+            }
+            else {
+                echo "Error num_rows";
+            }
+        }
+        else {
+            echo "Error execute";
+        }
+    }
+}
+ob_end_flush();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Uživatelé</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1>Můj účet</h1>
+</div>
+<p>
+    <a href="reset-password.php72" class="btn btn-warning" >Změnit heslo</a>
+    <a href="user_reservations.php72" class="btn btn-warning">Zrušit rezervaci</a>
+    <a href="logout.php72" class="btn btn-danger">Odhlásit se</a>
+</p>
+<?php
+if ((!strcmp($_SESSION["position"], "manager")) || (!strcmp($_SESSION["position"], "admin")) || (!strcmp($_SESSION["position"], "cashier"))) {
+    ?>
+    <div>
+        <a href="manage_reservations.php72" class="btn btn-warning">Správa rezervací uživatel</a>
+    </div> <?php
+}
+if ((!strcmp($_SESSION["position"], "manager")) || (!strcmp($_SESSION["position"], "admin"))) {
+    ?>
+    <div>
+        <a href="administration.php72" class="btn btn-warning">Administrace</a>
+    </div> <?php
+}
+?>
+</body>
+</html>

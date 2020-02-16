@@ -1,0 +1,293 @@
+<?php
+ob_start();
+// Initialize the session
+session_start();
+// Include config file
+require_once "config.php72";
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php72");
+    exit;
+}
+
+ob_end_flush();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <title>Filmy</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1>Řetězec multikin</h1>
+</div>
+<div id="movies">
+</div>
+<div class="container">
+    <tr class="row">
+
+        <table class="table">
+            <thead>
+            <tr class="filters">
+                <th>Název
+                    <select id="movie-filter" class="form-control">
+                        <option>Všechny</option>
+                        <?php
+                        $sql = "SELECT DISTINCT F.NAZEV FROM FILM F, PROMITACI_SAL_PROGRAM P WHERE F.ID = P.FILM_ID";
+                        if ($stmt = $mysqli->prepare($sql)) {
+                            $stmt->bind_result($movie);
+                            if ($stmt->execute()) {
+                                $stmt->store_result();
+                                for($i = 0; $i < $stmt->num_rows; $i++) {
+                                    $stmt->fetch();
+                                    echo '<option>'.$movie.'</option>';
+                                }
+                            }
+                            else {
+                                echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                            }
+                        }else {
+                            echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                        $stmt->close();
+                        ?>
+                    </select>
+                </th>
+                <th>Žánr
+                    <select id="genre-filter" class="form-control">
+                        <option>Všechny</option>
+                        <?php
+                        $sql = "SELECT DISTINCT F.ZANR FROM FILM F, PROMITACI_SAL_PROGRAM P WHERE F.ID = P.FILM_ID";
+                        if ($stmt = $mysqli->prepare($sql)) {
+                            $stmt->bind_result($genre);
+                            if ($stmt->execute()) {
+                                $stmt->store_result();
+                                for($i = 0; $i < $stmt->num_rows; $i++) {
+                                    $stmt->fetch();
+                                    echo '<option>'.$genre.'</option>';
+                                }
+                            }
+                            else {
+                                echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                            }
+                        }else {
+                            echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                        $stmt->close();
+                        ?>
+                    </select>
+                </th>
+                <th>Čas promítání
+                    <select id="time-filter" class="form-control">
+                        <option>Všechny</option>
+                        <?php
+                        $sql = "SELECT DISTINCT P.CAS FROM FILM F, PROMITACI_SAL_PROGRAM P WHERE F.ID = P.FILM_ID";
+                        if ($stmt = $mysqli->prepare($sql)) {
+                            $stmt->bind_result($genre);
+                            if ($stmt->execute()) {
+                                $stmt->store_result();
+                                for($i = 0; $i < $stmt->num_rows; $i++) {
+                                    $stmt->fetch();
+                                    echo '<option>'.$genre.'</option>';
+                                }
+                            }
+                            else {
+                                echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                            }
+                        }else {
+                            echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                        $stmt->close();
+                        ?>
+                    </select>
+                </th>
+                <th>Cena základní vstupenky
+                    <select id="adult-filter" class="form-control">
+                        <option>Všechny</option>
+                        <?php
+                        $sql = "SELECT DISTINCT F.CENA_DOSPELY FROM FILM F, PROMITACI_SAL_PROGRAM P WHERE F.ID = P.FILM_ID";
+                        if ($stmt = $mysqli->prepare($sql)) {
+                            $stmt->bind_result($price);
+                            if ($stmt->execute()) {
+                                $stmt->store_result();
+                                for($i = 0; $i < $stmt->num_rows; $i++) {
+                                    $stmt->fetch();
+                                    echo '<option>'.$price.'</option>';
+                                }
+                            }
+                            else {
+                                echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                            }
+                        }else {
+                            echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                        $stmt->close();
+                        ?>
+                    </select>
+                </th>
+                <th>Cena zlevněné vstupenky
+                    <select id="half-filter" class="form-control">
+                        <option>Všechny</option>
+                        <?php
+                        $sql = "SELECT DISTINCT F.CENA_ZLAVNENY FROM FILM F, PROMITACI_SAL_PROGRAM P WHERE F.ID = P.FILM_ID";
+                        if ($stmt = $mysqli->prepare($sql)) {
+                            $stmt->bind_result($price);
+                            if ($stmt->execute()) {
+                                $stmt->store_result();
+                                for($i = 0; $i < $stmt->num_rows; $i++) {
+                                    $stmt->fetch();
+                                    echo '<option>'.$price.'</option>';
+                                }
+                            }
+                            else {
+                                echo "Error executing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                            }
+                        }else {
+                            echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+                        }
+                        $stmt->close();
+                        ?>
+                    </select>
+                </th>
+            </tr>
+            </thead>
+        </table>
+
+
+        <div class="panel panel-primary filterable">
+            <div class="panel-heading">
+                <h3 class="panel-title">Filmy</h3>
+                <div class="pull-right"></div>
+            </div>
+
+            <table id="task-list-tbl" class="table">
+                <thead>
+                <tr>
+                    <th>Název</th>
+                    <th>Žánr</th>
+                    <th>Čas promítání</th>
+                    <th>Cena základní vstupenky</th>
+                    <th>Cena zlevněné vstupenky</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <?php
+                $sql = "SELECT F.NAZEV, F.ZANR, F.POPIS, F.ID, F.CENA_DOSPELY, F.CENA_ZLAVNENY, P.CAS, P.ID FROM FILM F ,PROMITACI_SAL_PROGRAM P WHERE F.ID = P.FILM_ID";
+                if($stmt = $mysqli->prepare($sql)){
+                    if ($stmt->execute()){
+                        $stmt->store_result();
+                        $stmt->bind_result($nazev, $zanr, $popis, $id, $adult, $half, $time, $screen_id);
+                        for ($i = 0; $i < $stmt->num_rows; $i++) {
+                            if ($result = $stmt->fetch()) {
+                ?>
+                <tr id="movie-<?php echo $id; ?>"
+                    class="task-list-row"
+                    data-movie-id="<?php echo $id; ?>"
+                    data-movie="<?php echo $nazev; ?>"
+                    data-date="<?php echo $time; ?>"
+                    data-genre="<?php echo $zanr; ?>"
+                    data-adult="<?php echo $adult; ?>"
+                    data-half="<?php echo $half; ?>">;
+                <td>
+                    <a style="margin-left: 20px;" data-toggle="modal" href="#myModal<?php echo $id; ?>" ><?php echo $nazev; ?></a>
+                </td>
+                <div id="myModal<?php echo $id; ?>" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <?php echo '<h3>'.$nazev.'</h3>'; ?>
+                            <?php echo '<p style="padding: 20px;">'.$popis.'</p>'; ?>
+                        </div>
+                    </div>
+                </div>
+                <td><?php echo $zanr; ?></td>
+                <td><?php echo $time; ?></td>
+                <td><?php echo $adult; ?></td>
+                <td><?php echo $half; ?></td>
+                <td><a href="reservation.php72?screen_id=<?php echo $screen_id ?>">Rezervovat</a></td>
+                <?php
+                if (strcmp($_SESSION["position"], "manager") && strcmp($_SESSION["position"], "cashier") && (strcmp($_SESSION["position"], "admin"))) {
+
+                }
+                else {
+                    echo '<td><a href="sale.php72?screen_id=' . $screen_id . '">Prodat rezervace</a></td>';
+                }
+                ?>
+                </tr> <?php
+                            }
+                        }
+                    }
+                }
+                ?>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+<script>
+    var
+        filters = {
+            movie: null,
+            date: null,
+            genre: null,
+            adult: null,
+            half: null
+        };
+
+    function updateFilters() {
+        $('.task-list-row').hide().filter(function() {
+            var
+                self = $(this),
+                result = true; // not guilty until proven guilty
+
+            Object.keys(filters).forEach(function (filter) {
+                if (filters[filter] && (filters[filter] != 'None') && (filters[filter] != 'Všechny')) {
+                    result = result && filters[filter] == self.data(filter);
+                }
+            });
+
+            return result;
+        }).show();
+    }
+
+    function changeFilter(filterName) {
+        filters[filterName] = this.value;
+        updateFilters();
+    }
+
+    // Assigned User Dropdown Filter
+    $('#movie-filter').on('change', function() {
+        changeFilter.call(this, 'movie');
+    });
+
+    // Task Milestone Dropdown Filter
+    $('#genre-filter').on('change', function() {
+        changeFilter.call(this, 'genre');
+    });
+
+    // Task Priority Dropdown Filter
+    $('#adult-filter').on('change', function() {
+        changeFilter.call(this, 'adult');
+    });
+
+    // Task Tags Dropdown Filter
+    $('#half-filter').on('change', function() {
+        changeFilter.call(this, 'half');
+    });
+
+    // Task Tags Dropdown Filter
+    $('#time-filter').on('change', function() {
+        changeFilter.call(this, 'date');
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+.mapouter {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.gmap {
+  margin-bottom: 70px;
+}
+
+.contact-boxes > div {
+  width: 30%;
+}
+
+.contact-boxes {
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 70px;
+}
+
+.kontakt-nakladna, .kontakt-osobna {
+  background: #eee;
+  border-radius: 25px;
+}

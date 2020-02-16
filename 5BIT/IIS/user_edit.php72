@@ -1,0 +1,104 @@
+<?php
+ob_start();
+session_start();
+
+// Include config file
+require_once "config.php72";
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php72");
+    exit;
+}
+if (strcmp($_SESSION["position"], "admin")) {
+    header("location: login.php72");
+    exit;
+}
+
+// Get id of user and chack
+if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0)
+{
+$id = $_GET['id'];
+}
+else
+{
+    header("location: manage_accounts.php72");
+    exit;
+}
+
+// Set sql querry
+$sql = "SELECT ID, JMENO, PRIJMENI, PRACOVNI_POZICE FROM UZIVATEL WHERE ID = ?";
+if ($stmt = $mysqli->prepare($sql)) {
+    // Bind variables
+    $stmt->bind_param("i", $id);
+    // Atempt to execute
+    if ($stmt->execute()) {
+        $stmt->store_result();
+        $stmt->bind_result($usr_id, $name, $surname, $usr_position);
+        $stmt->fetch();
+    }
+}
+
+// If we get post
+if (isset($_POST['submit'])){
+    // Prepare SQL
+    $sql = "UPDATE UZIVATEL SET JMENO=?, PRIJMENI=?, PRACOVNI_POZICE=? WHERE ID=?";
+    if ($stmt = $mysqli->prepare($sql)) {
+        // Bind variables
+        $stmt->bind_param("sssi", $postname, $postsurname, $postposition, $id);
+
+        $postname = $_POST['name'];
+        $postsurname = $_POST['surname'];
+        $postposition = $_POST['position'];
+        // Try to execute
+        if ($stmt->execute()) {
+            $stmt->store_result();
+        }
+    }
+    header("location: manage_accounts.php72");
+    exit;
+    ob_end_flush();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Úprava uživatele</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center; }
+        .wrapper{ width: 350px; padding: 20px; margin: 0px auto; }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>Úprava uživatele</h1>
+    </div>
+    <div class="wrapper">
+    <form action="" method="post">
+        <div class="form-group">
+            <label for="surname">Přijmení</label>
+            <input type="text" class="form-control" id="surname" name="surname" value="<?php echo $surname?>">
+        </div>
+        <div class="form-group">
+            <label for="name">Jméno</label>
+            <input type="text" class="form-control" id="name" name="name" value="<?php echo $name?>"> 
+        </div>
+        <div class="form-group">
+            <label for="position">Pozice</label>
+            <select id="position" class="form-control" name="position">
+                <option value="manager"<?php if(!strcmp($usr_position,"manager")){ echo "selected";} ?>>manager</option>
+                <option value="cashier"<?php if(!strcmp($usr_position,"cashier")){ echo "selected";} ?>>cashier</option>
+                <option value="user"<?php if(!strcmp($usr_position,"user")){ echo "selected";} ?>>user</option>
+                <option value="admin"<?php if(!strcmp($usr_position,"admin")){ echo "selected";} ?>>admin</option>
+            </select>
+        </div>
+        <button type="submit" name="submit" value="Změnit" class="btn btn-primary">Uložit</button>
+        <br>
+        <br>
+        <a href="reset-password.php72?userid=<?php echo $id ?>" class="btn btn-danger">Změnit heslo</a> 
+    </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<?php
+
+// Include config file
+require_once "config.php72";
+
+
+if(isset($_POST['row']) && isset($_POST['col']) && isset($_POST['id'])) { //if i have this post
+
+    $sql = "UPDATE REZERVACE SET ZAPLACENO = '1' WHERE ID_PROMITANI = ? AND RAD = ? AND SEDADLO = ?";
+    if ($stmt = $mysqli->prepare($sql)) {
+        $stmt->bind_param("iii", $param_screen, $param_row, $param_col);
+
+        $param_screen = $_POST['screen_id'];
+        $param_row = $_POST['row'];
+        $param_col = $_POST['col'];
+
+        if ($stmt->execute()) {
+            echo 'Done';
+        } else {
+            echo "Something went wrong. Please try again later.";
+        }
+    } else {
+        echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
+    $stmt->close();
+    $mysqli->close();
+}
+?>

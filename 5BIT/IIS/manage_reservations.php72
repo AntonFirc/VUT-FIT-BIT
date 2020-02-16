@@ -1,0 +1,175 @@
+<?php
+
+session_start();
+
+// Include config file
+require_once "config.php72";
+$res_id = NULL;
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: login.php72");
+    exit;
+}
+if ((strcmp($_SESSION["position"], "manager")) && (strcmp($_SESSION["position"], "cashier")) && (strcmp($_SESSION["position"], "admin"))) {
+    header("location: login.php72");
+    exit;
+}
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Správa rezervací</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; }
+        .wrapper{ width: 350px; padding: 20px; }
+        .dropbtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropbtn:hover, .dropbtn:focus {
+            background-color: #3e8e41;
+        }
+
+        #myInput {
+            border-box: box-sizing;
+            background-image: url('searchicon.png');
+            background-position: 14px 12px;
+            background-repeat: no-repeat;
+            font-size: 16px;
+            padding: 14px 20px 12px 45px;
+            border: none;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #myInput:focus {outline: 3px solid #ddd;}
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f6f6f6;
+            min-width: 230px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown a:hover {background-color: #ddd;}
+
+        .show {display: block;}
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("button").click(function(){
+            //document.getElementById("remove").click(function(){
+                var favorite = [];
+                $.each($("input[name='movie']:checked"), function(){
+                    favorite.push($(this).attr('id'));
+                });
+                //alert("My favourite sports are: " + favorite.join(", "));
+                $.each(favorite, function(i, val){
+
+                    var res_id = favorite[i];
+                    $.ajax({
+                        type: 'post', // the method (could be GET btw)
+                        url: 'cancel_reservation.php72', // The file where my php code is
+                        data: {
+                            'reservation': res_id, // all variables i want to pass. In this case, only one.
+                        },
+                        success: function(data) { // in case of success get the output, i named data
+                            if (i == (favorite.length - 1)) {
+                                alert("Rezervace zrušeny"); // do something with the output, like an alert
+                                location.reload();
+                            }
+
+
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
+            $("input").click(function(){
+                $(this).next().show();
+                $(this).next().hide();
+            });
+
+        });
+    </script>
+</head>
+<body>
+<div class="wrapper">
+    <input type="text" list="brow" id="sel_user" class="form-control">
+    <datalist id="brow" class="list-group">
+        <?php
+
+        $sql = "SELECT ID, JMENO, PRIJMENI, LOGIN FROM UZIVATEL";
+        if ($stmt = $mysqli->prepare($sql)) {
+            if ($stmt->execute()) {
+                $stmt->store_result();
+                $stmt->bind_result($usr_id,$name, $surname, $login);
+                for($i = 0; $i < $stmt->num_rows; $i++) {
+                    $stmt->fetch();
+                    echo '<option value="'.$usr_id.'">'.$name.' '.$surname.' ('.$login.')</option>';
+                }
+            }
+        }
+
+        ?>
+    </datalist>
+    <a onclick="showUser()" class="btn btn-primary">Vypsat rezervace</a>
+    <script>
+        function showUser() {
+                if (window.XMLHttpRequest) {
+                    // code for IE7+, Firefox, Chrome, Opera, Safari
+                    xmlhttp = new XMLHttpRequest();
+                } else {
+                    // code for IE6, IE5
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("txtHint").innerHTML = this.responseText;
+                    }
+                };
+                xmlhttp.open("GET","get_user.php72?id="+document.getElementById("sel_user").value,true);
+                xmlhttp.send();
+
+        }
+    </script>
+</div>
+<ul id="txtHint" class="list-group">
+
+</ul>
+<div>
+
+    <button type="submit" id="remove" class="btn btn-danger">Zrušit rezervaci</button>
+
+</div>
+</body>
+</html>

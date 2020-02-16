@@ -1,0 +1,26 @@
+<?php
+
+// Include config file
+require_once "config.php72";
+
+
+if(isset($_POST['reservation'])) { //if i have this post
+
+    $sql = "DELETE FROM REZERVACE WHERE ID = ?;";
+    if ($stmt = $mysqli->prepare($sql)) {
+        $stmt->bind_param("i", $param_id);
+
+        $param_id = $_POST['reservation'];
+
+        if ($stmt->execute()) {
+            echo $_POST['reservation'];
+        } else {
+            echo "Something went wrong. Please try again later.";
+        }
+    } else {
+        echo "Error preparing query: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
+    $stmt->close();
+    $mysqli->close();
+}
+?>

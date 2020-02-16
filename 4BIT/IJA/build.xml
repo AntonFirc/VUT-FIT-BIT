@@ -1,0 +1,77 @@
+<project name="IJA_Blocks" default="compile" basedir=".">
+    <description>
+        IJA projekt
+    </description>
+    <property name="dest.client" location="dest-client/"/>
+    <property name="build.dir" value="build/"/>
+    <property name="app.build.dir" value="build/main"/>
+    <!--<property name="test.build.dir" value="build/test"/>-->
+    <property name="app.src.dir" value="src/BlockScheme/"/>
+    <!--<property name="test.src.dir" value="src/Tests/"/>-->
+    <path id="classpath.test">
+        <!--<pathelement location="lib/junit-4.12.jar"/>
+        <pathelement location="lib/hamcrest-core-1.3.jar"/>-->
+        <pathelement location="${app.build.dir}"/>
+    </path>
+
+    <!-- COMPILE APP -->
+    <target name="compile" description="compile the application">
+        <mkdir dir="${app.build.dir}"/>
+        <javac srcdir="${app.src.dir}" destdir="${app.build.dir}" includeantruntime="false"/>
+    </target>
+
+    <!-- COMPILE TESTS -->
+    <!--<target name="compile" depends="compile-main" description="compile the tests">
+        <mkdir dir="${test.build.dir}"/>
+        <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
+            <classpath refid="classpath.test"/>
+        </javac>
+    </target>-->
+
+    <!-- DEST-CLIENT -->
+    <target name="dist" depends="compile" description="generate the distribution">
+        <jar jarfile="${dest.client}/ija-client.jar" basedir="${app.build.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="BlockScheme.Main" />
+            </manifest>
+        </jar>
+        <javadoc sourcepath="src" destdir="doc"/>
+
+    </target>
+
+    <!-- CLEAN -->
+    <target name="clean" description="clean up">
+        <delete includeEmptyDirs="true">
+            <fileset dir="${build.dir}" includes="**/*"/>
+        </delete>
+        <delete includeEmptyDirs="true">
+            <fileset dir="doc/" includes="**/*"/>
+        </delete>
+        <delete includeEmptyDirs="true">
+            <fileset dir="${dest.client}" includes="**/*"/>
+        </delete>
+    </target>
+
+    <!-- RUN APPLICATION -->
+    <target name="run" depends="dist">
+        <java jar="${dest.client}/ija-client.jar" fork="true"/>
+    </target>
+
+    <!-- RUN TESTS -->
+    <!--<target name="run" depends="compile">
+        <junit printsummary="on" haltonfailure="yes" fork="true">
+            <classpath>
+                <path refid="classpath.test"/>
+                <pathelement location="${test.build.dir}"/>
+            </classpath>
+            <formatter type="brief" usefile="false" />
+            <batchtest>
+                <fileset dir="${test.build.dir}" includes="**/tests/*Test.class" />
+            </batchtest>
+        </junit>
+    </target>-->
+
+    <target name="doc" description="Creates the documentation">
+        <javadoc sourcepath="src" destdir="doc"/>
+    </target>
+</project>

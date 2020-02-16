@@ -1,0 +1,6 @@
+Bandwidth measurement tool
+./ipk-mtrip reflect -p <cislo portu>
+./ipk-mtrip meter -h <adresa serveru> -p <cislo portu> -s <velkost paketu> -t <doba merania>
+
+Reflektor dokaze komunikovat naraz len s jednym klientom. Po ukonceni
+komunikacie moze reflektor obsluzit dalsieho klienta. Pri strate paketu moze dojst k zaseknutiu aplikacie. Vysledna rychlost nahravania moze byt skreslena pri vyrazne nizkej rychlosti stahovania. Na BSD niekedy nespravne nacitanie argumentov.

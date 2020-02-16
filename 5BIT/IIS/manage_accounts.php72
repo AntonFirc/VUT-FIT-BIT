@@ -1,0 +1,95 @@
+<?php
+session_start();
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php72");
+    exit;
+}
+if (strcmp($_SESSION["position"], "admin")) {
+    header("location: login.php72");
+    exit;
+}
+$orderby = "PRIJMENI";
+$order = "ASC";
+if (isset($_GET['orderby']))
+{
+    switch ($_GET['orderby']){
+        case "prijmeni":
+            $orderby = "PRIJMENI";
+            break;
+        case "jmeno":
+            $orderby = "JMENO";
+            break;
+        case "login":
+            $orderby = "LOGIN";
+            break;
+        case "pozice":
+            $orderby = "PRACOVNI_POZICE";
+            break;
+        default:
+            $orderby = "PRIJMENI";
+    }
+    if (isset($_GET['order'])) {
+        if ($_GET['order'] === "DESC")
+        $order = "DESC";
+    }
+}
+
+// Include config file
+require_once "config.php72";
+$users = [];
+$sql = "SELECT ID, JMENO, PRIJMENI, LOGIN, PRACOVNI_POZICE FROM UZIVATEL ORDER BY $orderby $order";
+    if ($stmt = $mysqli->prepare($sql)) {
+        if ($stmt->execute()) {
+            $stmt->store_result();
+            $stmt->bind_result($usr_id, $name, $surname, $login, $usr_position);
+            for($i = 0; $i < $stmt->num_rows; $i++) {
+                $stmt->fetch();
+                $users[$i]=[$usr_id, $name, $surname, $login, $usr_position];
+            }
+        }
+    }
+?>
+<head>
+    <meta charset="UTF-8">
+    <title>Správa uživatelů</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>
+            Správa uživatelů
+        </h1>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th><a href="manage_accounts.php72?orderby=prijmeni<?php if($orderby === "PRIJMENI" && $order === "ASC"){echo '&order=DESC';}else{echo'&order=ASC';}?>">Příjmení</a></th>
+                <th><a href="manage_accounts.php72?orderby=jmeno<?php if($orderby === "JMENO" && $order === "ASC"){echo '&order=DESC';}else{echo'&order=ASC';}?>">Jméno</a></th>
+                <th><a href="manage_accounts.php72?orderby=login<?php if($orderby === "LOGIN" && $order === "ASC"){echo '&order=DESC';}else{echo'&order=ASC';}?>">Login</a></th>
+                <th><a href="manage_accounts.php72?orderby=pozice<?php if($orderby === "PRACOVNI_POZICE" && $order === "ASC"){echo '&order=DESC';}else{echo'&order=ASC';}?>">Pozice</a></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+                for($i = 0; $i<count($users); $i++)
+                echo "<tr>
+                    <td>".$users[$i][2]."</td>
+                    <td>".$users[$i][1]."</td>
+                    <td>".$users[$i][3]."</td>
+                    <td>".$users[$i][4]."</td>
+                    <td><a href='user_edit.php72?id=".$users[$i][0]."' class='btn btn-primary'>Upravit</a></td>
+                    <td><a href='user_delete.php72?id=".$users[$i][0]."' class='btn btn-danger'>Smazat</a></td>
+                </tr>"
+            ?>
+        </tbody>
+    </table>
+    <a href="user_insert.php72" class="btn btn-warning">Přidat uživatele</a>
+
+</body>

@@ -1,0 +1,6 @@
+Klient-server aplikacia pre ziskanie udajov o uzivateloch.
+./ipk-server -p <cislo portu>
+./ipk-client -h <adresa serveru> -p <cislo portu> -n/f/l <login>
+
+Server dokaze komunikovat naraz len s jednym klientom. Po ukonceni
+komunikacie moze server obsluzit dalsieho klienta.

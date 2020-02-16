@@ -1,0 +1,22 @@
+<?php
+
+// Include config file
+require_once "config.php72";
+
+$usr_id = $_GET['id'];
+
+$sql = "SELECT R.ID, R.ID_PROMITANI, F.NAZEV, P.CAS  FROM REZERVACE R, FILM F, PROMITACI_SAL_PROGRAM P WHERE R.ID_PROMITANI = P.ID AND P.FILM_ID = F.ID AND R.UZIVATEL_ID = ?";
+if ($stmt = $mysqli->prepare($sql)) {
+    $stmt->bind_param("i", $usr_id);
+    if ($stmt->execute()) {
+        $stmt->store_result();
+        $stmt->bind_result($res_id,$screen_id, $film, $cas);
+        for($i = 0; $i < $stmt->num_rows; $i++) {
+            $stmt->fetch();
+            echo '<li class="list-group-item"><input type="checkbox" name="movie" id="'.$res_id.'">'.$film.' '.$cas.'</li>';
+        }
+    }
+
+}
+
+?>

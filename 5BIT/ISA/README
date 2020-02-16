@@ -1,0 +1,36 @@
+Sada aplikácií pre sledovanie RIP komunikácie a podvrhnutie RIPng routy.
+Autor: Anton Firc (xfirca00)
+
+MyRIPSniffer:
+	sleduje RIP správy na zadanom sieťovom rozhraní a vypisuje ich obsah
+	spustenie: sudo ./myripsniffer -i <rozhranie> 
+		(sudo ./myripsniffer -i eth0 spustí sledovanie na rozhraní eth0)
+	zoznam sieťových rozhraní je možné vypísať príkazom ifconfig
+
+MyRIPResponse:
+	podvrhnutie routy na zadanom sieťovom rozhraní
+	spustenie: sudo ./myripresponse -i <rozhranie> -r <IPv6>/[16-128] {-n <IPv6>} {-m [0-16]} {-t [0-65535]}
+	význam argumentov: -i - sieťové rozhranie
+			   -r - adresa podvrhávanej siete/dĺžka prefixu
+			   -n - next-hop IP adresa
+			   -m - metrika
+			   -t - router tag
+	(sudo ./myripresponse -i eth0 2001:db8:abc::/64 -n fe80::abc:123 -m 2 -t 50
+	odošle packet na rozhranie eth0, podvrhávaná sieť je 2001:db8:abc::/64, ktorá je dostupná 
+	cez next-hop adresu fe80::abc:123)
+
+Pre správny chod aplikácií (práca so sieťovými rozhraniami) je nutné spustiť aplikácie s administrátorskými povoleniami !
+
+Preklad aplikácií:
+
+	make
+		preloží obe aplikácie naraz
+
+	make myripsniffer
+		preloží sniffer RIP správ
+	
+	make myripresponse
+		preloží podvrhávač RIPng rout
+
+	make clean
+		vymaže preložené aplikácie a a súbory s príponou .o

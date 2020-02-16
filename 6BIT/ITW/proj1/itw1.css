@@ -1,0 +1,406 @@
+html {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.content {
+  max-width: 1170px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.header .content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header {
+  margin-top: 30px;
+}
+
+.header ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: none;
+}
+
+.header li {
+  float: left;
+}
+
+.header li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.header li a:hover {
+  color: #fd367e;
+}
+
+.main-title {
+  background-image: url("img/img-jumbotron-bg.jpg");
+  height: 100vh;
+  text-align: center;
+  color: white;
+  margin-top: -76px;
+  width: 100%;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.main-title .content {
+  padding-top: 70px;
+}
+
+.event-date {
+  font-size: 24px;
+  margin-top: 120px;
+}
+
+.main-title h1 {
+  font-size: 64px;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main-title .lead {
+  font-size: 19px;
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 75px;
+  color: #d1d1d1;
+  line-height: 30px;
+}
+
+.btn {
+  color: white;
+  outline: 2px solid white;
+  outline-offset: 15px;
+  text-decoration: none;
+  font-size: 19px;
+}
+
+.btn:hover {
+  color: #fd367e;
+  outline: 1px solid #fd367e;
+}
+
+a:hover {
+  color: #fd367e;
+}
+
+#section-intro {
+  margin-top: 100px;
+}
+
+#section-intro .lead {
+  float: left;
+  width: 65%;
+  font-size: 19px;
+  line-height: 30px;
+}
+
+#section-intro .lead p:nth-child(1) {
+  margin-top: 0px;
+}
+
+.contact {
+  margin-left: 730px;
+}
+
+address {
+  line-height: 25px;
+  color: #8c8c8c;
+}
+
+address strong {
+  color: black;
+}
+
+#section-speaker {
+  clear: both;
+  margin-top: 200px;
+  background: #e6e8ef;
+}
+
+#section-speaker h2 {
+  text-align: center;
+  padding-top: 50px;
+  text-transform: uppercase;
+  font-size: 36px;
+  color: #1e3066;
+  padding-bottom: 30px;
+}
+
+#section-speaker .section-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#section-speaker .thumbnail {
+  margin: 0px;
+  width: 23%;
+  text-align: center;
+}
+
+#section-speaker .thumbnail img {
+  width: 70%;
+}
+
+figcaption h3 {
+  text-align: center;
+  width: 65%;
+  margin-left: auto;
+  margin-right: auto;
+  color: #1e3066;
+}
+
+figcaption h3 small {
+    font-size: small;
+    text-transform: uppercase;
+    width: 105%;
+    color: #8c8c8c;
+    font-weight: lighter;
+}
+
+@media screen and (max-width: 768px) {
+  #section-speaker .thumbnail{
+    width: 50% ! !important;
+    }
+}
+
+#section-speaker .section-content figure:nth-child(2) h3,
+#section-speaker .section-content figure:nth-child(3) h3 {
+  width: 61%;
+}
+
+#section-speaker .section-content figure:nth-child(4) h3,
+#section-speaker .section-content figure:nth-child(7) h3 {
+  width: 53%;
+}
+
+#section-speaker .section-content figure:nth-child(6) h3 {
+  width: 41%;
+}
+
+#section-speaker .section-content figure:nth-child(5),
+#section-speaker .section-content figure:nth-child(6),
+#section-speaker .section-content figure:nth-child(7),
+#section-speaker .section-content figure:nth-child(8) {
+  margin-top: 20px;
+  padding-bottom: 150px;
+}
+
+#section-agenda h2 {
+  text-align: center;
+  padding-top: 50px;
+  text-transform: uppercase;
+  font-size: 36px;
+  color: #1e3066;
+  padding-bottom: 30px;
+}
+
+#section-agenda h3 {
+    font-size: 26px;
+    font-weight: normal;
+    padding-top: 20px;
+}
+
+#section-agenda h4 {
+  font-size: 20px;
+  text-transform: uppercase;
+  font-weight: normal;
+}
+
+#section-agenda span {
+  font-size: 15px;
+  display: block;
+}
+
+#section-agenda .section-title {
+  width: 100%;
+}
+
+.session {
+    border-left: solid 1px #e2e0e0;
+    padding: 20px;
+}
+time {
+    border-bottom: 1px solid #e2e0e0;
+    padding: 20px;
+    margin-left: -20px;
+}
+
+#section-agenda .content {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+}
+.agenda-part {
+    flex: 1 340px;
+    padding: 24px;
+}
+
+@media screen and (max-width: 760px) {
+  .agenda-part {
+      flex: 1 263px;
+      padding: 24px;
+  }
+  #section-intro .lead {
+    float: none;
+  }
+  .contact {
+    margin-left: 0px;
+  }
+}
+
+#section-agenda {
+  padding-bottom: 150px;
+}
+
+#section-pricing {
+  background: #e6e8ef;
+  height: 600px;
+  padding-bottom: 150px;
+}
+
+#section-pricing h2 {
+  text-align: center;
+  padding-top: 50px;
+  text-transform: uppercase;
+  font-size: 36px;
+  color: #1e3066;
+  margin-bottom: -15px;
+}
+
+#section-pricing h3 {
+  background-color: #1e3066;
+  color: white;
+  padding: 10px 0px 10px 0px;
+  font-size: 17px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.pricing-head {
+  width: 100%;
+}
+
+#section-pricing .section-title {
+  color: #8c8c8c;
+  width: 100%;
+  padding-bottom: 50px;
+}
+
+#section-pricing {
+  text-align: center;
+}
+
+#section-pricing .content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.price {
+  font-size: 64px;
+  font-weight: bold;
+  top: 40px;
+  position: relative;
+}
+
+.pricing-detail {
+  padding-top: 50px;
+}
+
+#section-pricing ul {
+  list-style-type: none;
+  line-height: 40px;
+  padding: 0;
+}
+
+#section-pricing .btn {
+  background-color: #fd367e;
+  padding: 14px 25px 14px 25px;
+  outline-offset: 0;
+}
+
+#section-pricing .btn:hover {
+  background-color: white;
+  outline-offset: 0;
+}
+
+.pricing-table-default {
+  color: #242a38;
+}
+
+/*#section-pricing .pricing-table-default:nth-child(2) {
+  float: left;
+  width: 300px;
+}
+
+#section-pricing .pricing-table-default:nth-child(3) {
+  margin: 0 auto;
+  width: 300px;
+}
+
+#section-pricing .pricing-table-default:nth-child(4) {
+  float: right;
+  width: 300px;
+}*/
+
+.pricing-table-default {
+    width: 29%;
+    height: 400px;
+    background-color: white;
+    margin-right: 19px;
+    margin-left: 19px;
+    margin-bottom: 38px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+#section-partner {
+  clear: both;
+}
+
+#section-partner h2 {
+  text-align: center;
+  padding-top: 50px;
+  text-transform: uppercase;
+  font-size: 36px;
+  color: #1e3066;
+  padding-bottom: 30px;
+}
+
+#section-partner .partner {
+  float: left;
+  width: 16%;
+}
+
+#footer {
+  clear: both;
+  padding-top: 200px;
+  padding-bottom: 50px;
+  text-align: center;
+  color: #8c8c8c;
+}
+
+#footer a {
+  text-decoration: none;
+  color: #fd367e;
+}

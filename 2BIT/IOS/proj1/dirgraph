@@ -1,0 +1,215 @@
+#!/bin/sh
+
+POSIXLY_CORRECT=yes
+
+nflag=0
+iflag=0
+
+while getopts :ni: opt
+do case "$opt" in
+n) nflag=1;;
+i) iflag=1
+   FILE_ERE=$OPTARG;;
+*) echo "Are you sure that given arguments are correct ?"
+   echo "Use options [-n] or [-i FILE_ERE] !"
+   exit 1;;
+esac
+done
+((OPTIND--))
+shift $OPTIND
+
+if [[ $# -eq 0 ]]; then   #if no directory was given in argument, uses current working directory
+  cd "${0%/*}"
+  printf "Root directory: ${0%/*}\n"
+else
+  cd $* || exit 1
+  printf "Root directory: $*\n"
+fi
+
+is_file=0       #count of files in target directory
+is_dir=1        #count of directories in target directory
+file_size=0     #auxiliary variable for file size
+file_type=""    #auxiliary variable to store file types
+
+declare -a arr_file_type    #array to store file type information
+declare -a arr_file_count   #array to store count of every file type
+
+declare -a arr_sizes=('  <100 B  : ' '  <1 KiB  : ' '  <10 KiB : ' '  <100 KiB: ' '  <1 MiB  : ' '  <10 MiB : ' '  <100 MiB: ' '  <1 GiB  : ' '  >=1 GiB : ')
+
+declare -a arr_file_size=(0 0 0 0 0 0 0 0 0) #array to sort file sizes into intervals
+# arr_file_size[number] :
+# 0 => <100B
+# 1 => <1KiB
+# 2 => <10KiB
+# 3 => <100KiB
+# 4 => <1MiB
+# 5 => <10MiB
+# 6 => <100MiB
+# 7 => <1GiB
+# 8 => >=1GiB
+
+for entry in *                # reads every file included inside target directory
+do
+  if [[ $iflag -eq 1 ]]; then           #ignores specific(FILE_ERE) entries if -i parameter was used
+    if [[ $entry =~ $FILE_ERE ]]; then
+      continue
+    fi
+  fi
+
+  if [ -f "$entry" ]; then    #counts how many files does target directory include and how big those files are
+    ((is_file++))
+
+    filesize=$(stat -c%s "$entry") #size of file in Bytes
+
+    if [[ $filesize -lt 100 ]]; then      #series of conditions to match filesize with right histogram size interval
+      ((arr_file_size[0]++))
+    elif [[ $filesize -lt 1024 ]]; then
+      ((arr_file_size[1]++))
+    elif [[ $filesize -lt 1024*10 ]]; then
+      ((arr_file_size[2]++))
+    elif [[ $filesize -lt 1024*100 ]]; then
+      ((arr_file_size[3]++))
+    elif [[ $filesize -lt 1024*1024 ]]; then
+      ((arr_file_size[4]++))
+    elif [[ $filesize -lt 1024*1024*10 ]]; then
+      ((arr_file_size[5]++))
+    elif [[ $filesize -lt 1024*1024*100 ]]; then
+      ((arr_file_size[6]++))
+    elif [[ $filesize -lt 1024*1024*1024 ]]; then
+      ((arr_file_size[7]++))
+    else
+      ((arr_file_size[8]++))
+    fi
+
+    file_type=$(file -b $entry | awk 'length > 40{$0=substr($0,0,37)"..."}1') #reads file type and shortens it to 40 characters(including ellipsis)
+
+    if [[ ${#file_type} < 40 ]]; then         #if file type is shorter than 40 chars adds spaces
+      while [[ ${#file_type} < 40 ]]; do
+        file_type+=" "
+      done
+    fi
+
+    if [[ $file_type == "empty" ]]; then
+      for (( i = 1; i < 36; i++ )); do
+      file_type+=" "
+      done
+    fi
+
+    exists=0      #exists=0 => does not exist ; exists=1 => does exist
+
+    for (( i=0; i<${#arr_file_type[@]}; i++ ));     #cycles through all array items
+    do
+      if [[ $file_type == ${arr_file_type[i]} ]]; then     #array item duplicity check
+        exists=1
+        ((arr_file_count[i]++))           #increases count of specific item if already exists
+        break                             #breaks the cycle when item found
+      fi
+    done
+
+    if [[ $exists -eq 0 ]]; then           #creates new item if it does not already exists
+      arr_file_type=("${arr_file_type[@]}" "$file_type")
+      arr_file_count=("${arr_file_count[@]}" "1")
+    fi
+
+  fi
+
+  if [ -d "$entry" ]; then    #counts how many directories does target directory include
+    ((is_dir++))
+  fi
+
+done
+
+echo "Directories: $is_dir"     #prints number of directories in target directory
+echo "All files: $is_file"      #prints number of all files in target directory
+
+echo "File size histogram:"
+
+if [[ $nflag -eq 1 ]]; then     #if -n argument was used sets maximal line width for printing histograms
+  if test [$(tty -s)]; then     #tests if run in terminal; if yes uses terminal window width, if no uses fixed value of 80 columns
+      ((cols=$(tput cols)-13))
+  else
+    cols=67
+  fi
+
+max_cnt=0
+for (( i = 0; i < ${#arr_file_size[@]}; i++ )); do  #loops trough array of sizes to get maximal count
+  if [[ ${arr_file_size[i]} -gt $max_cnt ]]; then
+    max_cnt=${arr_file_size[i]}
+  fi
+done
+
+if [[ $max_cnt -gt $cols ]]; then                 #checks if maximal count is small enough to be printed in defined width or values need to be adjusted
+  for (( j = 0; j < ${#arr_file_size[@]}; j++ )); do
+    arr_file_size[j]=$(((${arr_file_size[j]} * $cols + $max_cnt -1) / $max_cnt))    #adjusts all values in the same ratio
+  done
+fi
+fi
+
+for i in {0..8};                #loops through all filesize intervals
+        do
+                printf "${arr_sizes[i]}"  #prints interval range
+                for (( j=0; j<${arr_file_size[i]}; j++ ));  #prints '#' according to the count of every entry in filesize interval
+                do
+                  printf '#'
+                done
+                printf "\n"
+        done
+
+echo "File type histogram:"
+
+if [ ${#arr_file_type[@]} -eq 0 ]; then     #if target directory contains no files skips printing file histogram
+    exit
+else
+
+if [[ ${#arr_file_type[@]} -lt 10 ]]; then    #determines range of the for cycle
+  border=${#arr_file_type[@]}
+else
+  border=10
+fi
+
+if [[ $nflag -eq 1 ]]; then           #if -n argument was used sets maximal line width for printing histograms
+  if test [$(tty -s)]; then           #tests if run in terminal; if yes uses terminal window width, if no uses fixed value of 80 columns
+    ((cols=$(tput cols)-45))
+  else
+    cols=35
+  fi
+
+
+  max_cnt=0
+  for (( i = 0; i < ${#arr_file_count[@]}; i++ )); do  #loops trough array of file counts to get maximal count
+    if [[ ${arr_file_count[i]} -gt $max_cnt ]]; then
+      max_cnt=${arr_file_count[i]}
+    fi
+  done
+
+  if [[ $max_cnt -gt $cols ]]; then                   #checks if maximal count is small enough to be printed in defined width or values need to be adjusted
+    for (( j = 0; j < ${#arr_file_count[@]}; j++ )); do
+      arr_file_count[j]=$(((${arr_file_count[j]} * $cols + $max_cnt -1) / $max_cnt))      #adjusts all values in the same ratio
+    done
+  fi
+fi
+  max=0
+  while [[ $max -ne -1 ]]; do         #cycle to print max 10 most represented file types in target directory
+
+    for (( i=0; i<$border ; i++ ));
+    do
+      if [[ ${arr_file_count[i]} -gt $max ]]; then      #sequentially finds the item with highest count to be printed as first
+        max=${arr_file_count[i]}
+        index=$i
+      fi
+    done
+
+    if [[ $max -eq -1 ]]; then                        #breaks whole cycle if all items were printed
+      break
+    fi
+
+  printf "  ${arr_file_type[index]}: "
+  for (( j=0; j<${arr_file_count[index]}; j++ ));  #prints '#' according to the count of every filetype entry
+  do
+    printf '#'
+  done
+  printf "\n"
+  arr_file_count[index]=-1                        #resets item count after printing
+  max=-2
+  done
+fi

@@ -1,0 +1,37 @@
+<?php
+ob_start();
+// Initialize the session
+session_start();
+
+// Include config file
+require_once "config.php72";
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php72");
+    exit;
+}
+ob_end_flush();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Domov</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1>Vítejte v našem multikině!</h1>
+</div>
+<div>
+    <a href="index.php72" class="btn btn-primary" style="margin-bottom: 30px;">Prohlížet program</a>
+</div>
+<p>
+    <a href="user.php72" class="btn btn-warning" >Můj účet</a>
+</p>
+</body>
+</html>
